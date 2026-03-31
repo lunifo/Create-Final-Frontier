@@ -1,4 +1,4 @@
-package net.examplemod.fabric;
+package io.github.lunifo.finalfrontier.fabric;
 
 import net.fabricmc.loader.api.FabricLoader;
 

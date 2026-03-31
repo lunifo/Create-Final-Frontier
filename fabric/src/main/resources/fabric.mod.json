@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "finalfrontier",
   "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Create: Final Frontier",
+  "description": "A Minecraft Create mod addon focusing on semi-realistic space travel",
   "authors": [
     "Me!"
   ],
@@ -12,16 +12,16 @@
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
   "license": "Insert License Here",
-  "icon": "assets/examplemod/icon.png",
+  "icon": "assets/finalfrontier/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.examplemod.fabric.ExampleModFabric"
+      "io.github.lunifo.finalfrontier.fabric.FinalFrontierFabric"
     ]
   },
   "mixins": [
-    "examplemod.mixins.json",
-    "examplemod-common.mixins.json"
+    "finalfrontier.mixins.json",
+    "finalfrontier-common.mixins.json"
   ],
   "depends": {
     "minecraft": "${minecraft_version}",

@@ -4,30 +4,30 @@ loaderVersion = "[${forge_version},)"
 license = "Insert License Here"
 
 [[mods]]
-modId = "examplemod"
+modId = "finalfrontier"
 version = "${version}"
-displayName = "Example Mod"
+displayName = "Create: Final Frontier"
 authors = "Me!"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+A Minecraft Create mod addon focusing on semi-realistic space travel
 '''
 logoFile = "icon.png"
 
-[[dependencies.examplemod]]
+[[dependencies.finalfrontier]]
 modId = "forge"
 mandatory = true
 versionRange = "[${forge_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.examplemod]]
+[[dependencies.finalfrontier]]
 modId = "minecraft"
 mandatory = true
 versionRange = "${minecraft_version}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.examplemod]]
+[[dependencies.finalfrontier]]
 modId="create"
 mandatory=true
 versionRange="${create_version}"
