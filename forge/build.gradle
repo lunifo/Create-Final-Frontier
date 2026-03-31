@@ -25,7 +25,9 @@ configurations {
 }
 
 repositories {
-    // No additional repositories are needed on forge, Tterrag's has it all.
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
+    maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
 }
 
 dependencies {
@@ -34,9 +36,13 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     // Create and its dependencies
-    modImplementation("com.simibubi.create:create-$minecraft_version:$create_forge_version:slim") { transitive = false }
-    modImplementation("com.tterrag.registrate:Registrate:$registrate_forge_version")
-    modImplementation("com.jozufozu.flywheel:flywheel-forge-$flywheel_forge_minecraft_version:$flywheel_forge_version")
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
+    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_forge_version}")
+    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_forge_version}")
+    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_forge_version}")
+    modImplementation("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 
     // Development QOL
     modLocalRuntime("mezz.jei:jei-$minecraft_version-forge:$jei_version") { transitive = false }
