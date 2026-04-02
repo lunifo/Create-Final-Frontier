@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "io.github.lunifo.finalfrontier.fabric.FinalFrontierFabric"
+    ],
+    "fabric-datagen": [
+      "io.github.lunifo.finalfrontier.fabric.FinalFrontierDataGeneration"
     ]
   },
   "mixins": [

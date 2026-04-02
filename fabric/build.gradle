@@ -8,7 +8,20 @@ architectury {
 }
 
 loom {
-    accessWidenerPath = project(":common").loom.accessWidenerPath
+    def commonProject = project(":common")
+    accessWidenerPath = commonProject.loom.accessWidenerPath
+
+    runs {
+        datagen {
+            client()
+
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${commonProject.file("src/generated/resources")}"
+            vmArg "-Dfabric-api.datagen.modid=finalfrontier"
+            vmArg "-Dporting_lib.datagen.existing_resources=${commonProject.file("src/main/resources")}"
+        }
+    }
 }
 
 configurations {
