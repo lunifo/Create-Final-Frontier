@@ -4,7 +4,6 @@
   "package": "io.github.lunifo.finalfrontier.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "MixinTitleScreen"
   ],
   "mixins": [
   ],

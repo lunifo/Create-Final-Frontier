@@ -14,8 +14,8 @@ public class FinalFrontier {
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
     public static void init() {
-        LOGGER.info("{} initializing! Create version: {} on platform: {}", NAME, CreateBuildInfo.VERSION, ExampleExpectPlatform.platformName());
-        FinalFrontierBlocks.init(); // hold registrate in a separate class to avoid loading early on forge
+        LOGGER.info("{} initializing! Create version: {}", NAME, CreateBuildInfo.VERSION);
+        FinalFrontierBlocks.init();
     }
 
     public static ResourceLocation id(String path) {
