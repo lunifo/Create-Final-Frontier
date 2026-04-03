@@ -8,8 +8,8 @@
     "Me!"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "issues": "https://github.com/lunifo/Create-Final-Frontier/issues",
+    "sources": "https://github.com/lunifo/Create-Final-Frontier"
   },
   "license": "MIT",
   "icon": "assets/finalfrontier/icon.png",

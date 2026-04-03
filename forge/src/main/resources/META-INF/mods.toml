@@ -1,12 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "[${forge_version},)"
-#issueTrackerURL = ""
+issueTrackerURL = "https://github.com/lunifo/Create-Final-Frontier/issues"
 license = "MIT"
 
 [[mods]]
 modId = "finalfrontier"
 version = "${version}"
 displayName = "Create: Final Frontier"
+displayURL = "https://github.com/lunifo/Create-Final-Frontier"
 authors = "Me!"
 description = '''
 A Minecraft Create mod addon focusing on semi-realistic space travel
