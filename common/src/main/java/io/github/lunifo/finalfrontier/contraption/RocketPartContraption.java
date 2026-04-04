@@ -12,11 +12,11 @@ import org.apache.commons.lang3.tuple.Pair;
 public class RocketPartContraption extends Contraption {
 	@Override
 	public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
-		searchMovedStructure(world, pos, null);
+		boolean success = searchMovedStructure(world, pos, null);
 
 		addBlock(world, pos, Pair.of(new StructureTemplate.StructureBlockInfo(pos, world.getBlockState(pos), null), null));
 
-		return false;
+		return success;
 	}
 
 	@Override
