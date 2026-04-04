@@ -14,5 +14,7 @@ public class FinalFrontierFabric implements ModInitializer {
                 ), FinalFrontier.NAME);
         // on fabric, Registrates must be explicitly finalized and registered.
         FinalFrontier.REGISTRATE.register();
+
+        FinalFrontier.registerCreateDependent();
     }
 }

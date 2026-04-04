@@ -4,6 +4,7 @@ import io.github.lunifo.finalfrontier.FinalFrontier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegisterEvent;
 
 @Mod(FinalFrontier.MOD_ID)
 public class FinalFrontierForge {
@@ -12,5 +13,11 @@ public class FinalFrontierForge {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         FinalFrontier.REGISTRATE.registerEventListeners(eventBus);
         FinalFrontier.init();
+
+        eventBus.addListener(FinalFrontierForge::onRegister);
+    }
+
+    private static void onRegister(RegisterEvent event) {
+        FinalFrontier.registerCreateDependent();
     }
 }
