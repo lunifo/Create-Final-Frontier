@@ -2,6 +2,7 @@ package io.github.lunifo.finalfrontier;
 
 import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import io.github.lunifo.finalfrontier.block.FinalFrontierBlocks;
 import io.github.lunifo.finalfrontier.contraption.FinalFrontierContraptionTypes;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
 import net.minecraft.resources.ResourceLocation;
