@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import io.github.lunifo.finalfrontier.block.FinalFrontierBlocks;
 import io.github.lunifo.finalfrontier.contraption.FinalFrontierContraptionTypes;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
+import io.github.lunifo.finalfrontier.particle.FinalFrontierParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class FinalFrontier {
         LOGGER.info("{} initializing! Create version: {}", NAME, CreateBuildInfo.VERSION);
         FinalFrontierBlocks.init();
         FinalFrontierEntityTypes.init();
+        FinalFrontierParticleTypes.init();
     }
 
     public static void registerCreateDependent() {

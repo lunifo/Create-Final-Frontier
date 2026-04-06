@@ -14,7 +14,9 @@ public class FinalFrontierForge {
         FinalFrontier.REGISTRATE.registerEventListeners(eventBus);
         FinalFrontier.init();
 
+        PlatformHelperImpl.ParticleRegistrationHelperForge.register(eventBus);
         eventBus.addListener(FinalFrontierForge::onRegister);
+        eventBus.addListener(PlatformHelperImpl.ParticleRegistrationHelperForge::registerClient);
     }
 
     private static void onRegister(RegisterEvent event) {
