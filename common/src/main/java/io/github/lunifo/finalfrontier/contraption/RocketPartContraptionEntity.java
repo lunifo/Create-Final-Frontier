@@ -71,8 +71,10 @@ public class RocketPartContraptionEntity extends OrientedContraptionEntity {
 		compound.putBoolean("InFlight", inFlight);
 
 		// Temporary variable for testing
-		int[] initialPosArray = {initialPos.getX(), initialPos.getY(), initialPos.getZ()};
-		compound.putIntArray("InitialPos", initialPosArray);
+		if (initialPos != null) {
+			int[] initialPosArray = {initialPos.getX(), initialPos.getY(), initialPos.getZ()};
+			compound.putIntArray("InitialPos", initialPosArray);
+		}
 	}
 
 	public void startFlight() {
