@@ -6,7 +6,7 @@ import io.github.lunifo.finalfrontier.FinalFrontier;
 import io.github.lunifo.finalfrontier.behaviour.interaction.ShipControlsBehaviour;
 
 public class FinalFrontierBlocks {
-	public static BlockEntry<ShipControlsBlock> SHIP_CONTROLS = FinalFrontier.REGISTRATE
+	public static final BlockEntry<ShipControlsBlock> SHIP_CONTROLS = FinalFrontier.REGISTRATE
 			.block("ship_controls", ShipControlsBlock::new)
 			.simpleItem()
 			.onRegister(MovingInteractionBehaviour.interactionBehaviour(new ShipControlsBehaviour()))
