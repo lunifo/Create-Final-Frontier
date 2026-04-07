@@ -14,8 +14,11 @@ public class LaunchSmokeParticle extends TextureSheetParticle {
 	protected LaunchSmokeParticle(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i, SpriteSet spriteSet) {
 		super(clientLevel, d, e, f, g, h, i);
 		this.spriteSet = spriteSet;
-		this.quadSize *= 30;
-		this.lifetime = 60;
+		this.quadSize *= 25;
+		this.xd *= 3;
+		this.yd *= 0;
+		this.zd *= 3;
+		this.lifetime = 100;
 		this.setSpriteFromAge(spriteSet);
 	}
 
