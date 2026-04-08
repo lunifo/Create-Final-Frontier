@@ -11,9 +11,11 @@ import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	boolean inFlight = false;
@@ -41,7 +43,9 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	public void tick() {
 		super.tick();
 		if (inFlight) {
-			move(0, 0.5, 0);
+			setContraptionMotion(getDeltaMovement().add(new Vec3(0, .0005, 0)));
+			Vec3 velocity = getDeltaMovement();
+			move(velocity.x, velocity.y, velocity.z);
 
 			// Temporary test flight
 			if (getY() > 256) {
@@ -56,6 +60,13 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		}
 
 		prevOrientation = orientation.copy();
+	}
+
+	@Override
+	public void load(@NotNull CompoundTag compoundTag) {
+		super.load(compoundTag);
+		ListTag motionList = compoundTag.getList("Motion", 6);
+		setContraptionMotion(new Vec3(motionList.getDouble(0), motionList.getDouble(1), motionList.getDouble(2)));
 	}
 
 	@Override
