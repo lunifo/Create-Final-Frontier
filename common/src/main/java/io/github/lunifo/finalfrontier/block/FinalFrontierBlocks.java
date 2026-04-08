@@ -26,6 +26,12 @@ public class FinalFrontierBlocks {
 			.onRegister(MovementBehaviour.movementBehaviour(new EngineBehaviour()))
 			.register();
 
+	public static final BlockEntry<?> STAGE_DECOUPLER = FinalFrontier.REGISTRATE
+			.block("stage_decoupler", StageDecouplerBlock::new)
+			.simpleItem()
+			.blockstate((ctx, provider) -> provider.directionalBlock(ctx.get(), cubeBottomTop(ctx, provider)))
+			.register();
+
 	private static ModelFile cubeBottomTop(DataGenContext<?, ?> ctx, BlockStateProvider provider) {
 		String name = ctx.getName();
 		return provider.models().cubeBottomTop(
