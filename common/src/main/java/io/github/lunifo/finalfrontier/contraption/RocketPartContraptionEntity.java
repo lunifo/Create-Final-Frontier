@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -122,6 +123,21 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	}
 
 	@Override
+	public Vec3 getPassengerPosition(Entity passenger, float partialTicks) {
+		if (passenger instanceof RocketPartContraptionEntity rocketPartEntity) {
+			BlockPos localAnchorPos = ((RocketPartContraption) rocketPartEntity.contraption).decouplerAnchor;
+			if (localAnchorPos == null) {
+				return null;
+			}
+			Vec3 localAnchorVec = localAnchorPos.getCenter();
+			Vec3 globalAnchorVec = toGlobalVector(localAnchorVec, 1);
+			return globalAnchorVec.subtract(0, 0.5, 0);
+		} else {
+			return super.getPassengerPosition(passenger, partialTicks);
+		}
+	}
+
+	@Override
 	public Vec3 getAnchorVec() {
 		return super.getAnchorVec().subtract(0.5, 0, 0.5);
 	}
@@ -129,6 +145,14 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	@Override
 	public Vec3 getPrevAnchorVec() {
 		return super.getPrevAnchorVec().subtract(0.5, 0, 0.5);
+	}
+
+	@Override
+	protected boolean canAddPassenger(Entity entity) {
+		if (entity instanceof AbstractContraptionEntity) {
+			return entity instanceof RocketPartContraptionEntity;
+		}
+		return super.canAddPassenger(entity);
 	}
 
 	@Override

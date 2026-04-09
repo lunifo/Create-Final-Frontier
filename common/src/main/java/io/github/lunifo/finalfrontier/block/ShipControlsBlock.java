@@ -1,6 +1,7 @@
 package io.github.lunifo.finalfrontier.block;
 
 import com.simibubi.create.content.contraptions.AssemblyException;
+import io.github.lunifo.finalfrontier.FinalFrontier;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraption;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraptionEntity;
 import net.minecraft.core.BlockPos;
@@ -30,22 +31,39 @@ public class ShipControlsBlock extends Block {
 				return InteractionResult.SUCCESS;
 			}
 
-			RocketPartContraption rocketPart = new RocketPartContraption();
 			try {
-				rocketPart.assemble(level, blockPos);
+				RocketPartContraptionEntity rocketPartEntity = createRocketPart(blockPos, level);
+				level.addFreshEntity(rocketPartEntity);
 			} catch (AssemblyException e) {
 				return InteractionResult.PASS;
 			}
 
-			rocketPart.removeBlocksFromWorld(level, BlockPos.ZERO);
-			rocketPart.startMoving(level);
-			rocketPart.expandBoundsAroundAxis(Direction.Axis.Y);
-
-			RocketPartContraptionEntity rocketPartEntity = RocketPartContraptionEntity.create(level, rocketPart);
-			rocketPartEntity.setPos(Vec3.atBottomCenterOf(blockPos));
-			level.addFreshEntity(rocketPartEntity);
 			return InteractionResult.SUCCESS;
 		}
 		return super.use(blockState, level, blockPos, player, interactionHand, blockHitResult);
+	}
+
+	private RocketPartContraptionEntity createRocketPart(BlockPos anchor, Level level) throws AssemblyException {
+		RocketPartContraption rocketPart = new RocketPartContraption();
+
+		rocketPart.assemble(level, anchor);
+
+		rocketPart.removeBlocksFromWorld(level, BlockPos.ZERO);
+		rocketPart.startMoving(level);
+		rocketPart.expandBoundsAroundAxis(Direction.Axis.Y);
+
+		RocketPartContraptionEntity rocketPartEntity = RocketPartContraptionEntity.create(level, rocketPart);
+		rocketPartEntity.setPos(Vec3.atBottomCenterOf(anchor));
+
+		for (var decouplerPair : rocketPart.decouplerPairs) {
+			BlockPos nextPartAnchor = decouplerPair.getRight();
+			RocketPartContraptionEntity nextPart = createRocketPart(nextPartAnchor, level);
+			((RocketPartContraption) nextPart.getContraption()).decouplerAnchor = decouplerPair.getRight().subtract(rocketPart.anchor);
+			level.addFreshEntity(nextPart);
+			nextPart.startRiding(rocketPartEntity);
+			FinalFrontier.LOGGER.info("{}", rocketPartEntity.getPassengers());
+		}
+
+		return rocketPartEntity;
 	}
 }
