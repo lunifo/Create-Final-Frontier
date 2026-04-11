@@ -51,7 +51,8 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			// Temporary test flight
 			if (getY() > 256) {
 				if (initialPos != null) {
-					setPos(Vec3.atBottomCenterOf(initialPos));
+					Vec3 initialVec = Vec3.atBottomCenterOf(initialPos);
+					teleportTo(initialVec.x, initialVec.y, initialVec.z);
 					inFlight = false;
 					if (!level().isClientSide()) {
 						disassemble();
@@ -61,6 +62,16 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		}
 
 		prevOrientation = orientation.copy();
+	}
+
+	@Override
+	public void disassemble() {
+		super.disassemble();
+		for (var passenger : getPassengers()) {
+			if (passenger instanceof RocketPartContraptionEntity rocketPartEntity) {
+				rocketPartEntity.disassemble();
+			}
+		}
 	}
 
 	@Override
