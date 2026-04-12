@@ -24,6 +24,9 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	public Orientation orientation = new Orientation();
 	private Orientation prevOrientation = new Orientation();
 
+	private int despawnTicks;
+	private boolean isDetached;
+
 	// Temporary variable for testing
 	BlockPos initialPos;
 
@@ -61,7 +64,37 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			}
 		}
 
+		if (isDetached) {
+			if (despawnTicks-- == 0) {
+				discard();
+			}
+		}
+
 		prevOrientation = orientation.copy();
+	}
+
+	public void detach() {
+		stopRiding();
+		isDetached = true;
+		despawnTicks = 200;
+	}
+
+	public void stage() {
+		boolean shouldDetach = true;
+		for (var passenger : getPassengers()) {
+			if (passenger instanceof RocketPartContraptionEntity rocketPartEntity) {
+				shouldDetach = false;
+				rocketPartEntity.stage();
+			}
+		}
+
+		if (shouldDetach && getVehicle() != null) {
+			detach();
+		}
+	}
+
+	public boolean isInFlight() {
+		return inFlight;
 	}
 
 	@Override

@@ -11,7 +11,11 @@ public class ShipControlsBehaviour extends MovingInteractionBehaviour {
 	@Override
 	public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
 		if (contraptionEntity instanceof RocketPartContraptionEntity rocketPartEntity) {
-			rocketPartEntity.startFlight();
+			if (rocketPartEntity.isInFlight()) {
+				rocketPartEntity.stage();
+			} else {
+				rocketPartEntity.startFlight();
+			}
 			return true;
 		}
 		return false;
