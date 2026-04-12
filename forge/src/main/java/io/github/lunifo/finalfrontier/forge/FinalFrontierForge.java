@@ -1,7 +1,9 @@
 package io.github.lunifo.finalfrontier.forge;
 
 import io.github.lunifo.finalfrontier.FinalFrontier;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
@@ -16,7 +18,9 @@ public class FinalFrontierForge {
 
         PlatformHelperImpl.ParticleRegistrationHelperForge.register(eventBus);
         eventBus.addListener(FinalFrontierForge::onRegister);
-        eventBus.addListener(PlatformHelperImpl.ParticleRegistrationHelperForge::registerClient);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            eventBus.addListener(PlatformHelperImpl.ParticleRegistrationHelperForge::registerClient);
+        });
     }
 
     private static void onRegister(RegisterEvent event) {

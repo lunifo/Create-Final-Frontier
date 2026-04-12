@@ -5,9 +5,14 @@ import com.simibubi.create.foundation.data.CreateEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.EntityBuilder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class PlatformHelper {
@@ -22,6 +27,11 @@ public class PlatformHelper {
 	}
 
 	public interface ParticleRegistrationHelper {
-		Supplier<SimpleParticleType> register(SimpleParticleType particle, Supplier<ParticleEngine.SpriteParticleRegistration<SimpleParticleType>> particleProvider, String name);
+		Supplier<SimpleParticleType> register(SimpleParticleType particle, ParticleProviderWrapper particleProvider, String name);
+
+		interface ParticleProviderWrapper {
+			@Environment(EnvType.CLIENT)
+			Function<SpriteSet, ParticleProvider<SimpleParticleType>> get();
+		}
 	}
 }

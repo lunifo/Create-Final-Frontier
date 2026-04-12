@@ -18,6 +18,9 @@
     "main": [
       "io.github.lunifo.finalfrontier.fabric.FinalFrontierFabric"
     ],
+    "client": [
+      "io.github.lunifo.finalfrontier.fabric.FinalFrontierClientFabric"
+    ],
     "fabric-datagen": [
       "io.github.lunifo.finalfrontier.fabric.FinalFrontierDataGeneration"
     ]

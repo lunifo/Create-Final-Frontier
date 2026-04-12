@@ -7,12 +7,15 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.EntityBuilder;
 import io.github.lunifo.finalfrontier.FinalFrontier;
 import io.github.lunifo.finalfrontier.PlatformHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class PlatformHelperImpl {
@@ -27,13 +30,22 @@ public class PlatformHelperImpl {
 		return ParticleRegistrationHelperFabric.INSTANCE;
 	}
 
-	private static class ParticleRegistrationHelperFabric implements PlatformHelper.ParticleRegistrationHelper {
+	public static class ParticleRegistrationHelperFabric implements PlatformHelper.ParticleRegistrationHelper {
 		static ParticleRegistrationHelperFabric INSTANCE = new ParticleRegistrationHelperFabric();
 
 		private ParticleRegistrationHelperFabric() {}
 
-		public Supplier<SimpleParticleType> register(SimpleParticleType particle, Supplier<ParticleEngine.SpriteParticleRegistration<SimpleParticleType>> particleProvider, String name) {
-			ParticleFactoryRegistry.getInstance().register(particle, spriteSet -> particleProvider.get().create(spriteSet));
+		private static final Map<SimpleParticleType, ParticleProviderWrapper> PARTICLE_PROVIDERS = new HashMap<>();
+
+		@Environment(EnvType.CLIENT)
+		public static void registerClient() {
+			for (var entry : PARTICLE_PROVIDERS.entrySet()) {
+				ParticleFactoryRegistry.getInstance().register(entry.getKey(), entry.getValue().get()::apply);
+			}
+		}
+
+		public Supplier<SimpleParticleType> register(SimpleParticleType particle, ParticleProviderWrapper particleProviderWrapper, String name) {
+			PARTICLE_PROVIDERS.put(particle, particleProviderWrapper);
 			SimpleParticleType registeredParticle = Registry.register(BuiltInRegistries.PARTICLE_TYPE, FinalFrontier.id(name), particle);
 			return () -> registeredParticle;
 		}

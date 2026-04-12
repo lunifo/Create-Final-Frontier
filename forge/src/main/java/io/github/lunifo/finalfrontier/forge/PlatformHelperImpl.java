@@ -7,7 +7,6 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.EntityBuilder;
 import io.github.lunifo.finalfrontier.FinalFrontier;
 import io.github.lunifo.finalfrontier.PlatformHelper;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -39,7 +38,7 @@ public class PlatformHelperImpl {
 		private ParticleRegistrationHelperForge() {}
 
 		private static final DeferredRegister<ParticleType<?>> PARTICLE_REGISTER = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, FinalFrontier.MOD_ID);
-		private static final Map<SimpleParticleType, Supplier<ParticleEngine.SpriteParticleRegistration<SimpleParticleType>>> PARTICLE_PROVIDERS = new HashMap<>();
+		private static final Map<SimpleParticleType, ParticleProviderWrapper> PARTICLE_PROVIDERS = new HashMap<>();
 		public static void register(IEventBus eventBus) {
 			PARTICLE_REGISTER.register(eventBus);
 		}
@@ -47,12 +46,12 @@ public class PlatformHelperImpl {
 		@OnlyIn(Dist.CLIENT)
 		public static void registerClient(RegisterParticleProvidersEvent event) {
 			for (var entry : PARTICLE_PROVIDERS.entrySet()) {
-				event.registerSpriteSet(entry.getKey(), entry.getValue().get());
+				event.registerSpriteSet(entry.getKey(), spriteSet -> entry.getValue().get().apply(spriteSet));
 			}
 		}
 
-		public Supplier<SimpleParticleType> register(SimpleParticleType particle, Supplier<ParticleEngine.SpriteParticleRegistration<SimpleParticleType>> particleProvider, String name) {
-			PARTICLE_PROVIDERS.put(particle, particleProvider);
+		public Supplier<SimpleParticleType> register(SimpleParticleType particle, ParticleProviderWrapper particleProviderWrapper, String name) {
+			PARTICLE_PROVIDERS.put(particle, particleProviderWrapper);
 			return PARTICLE_REGISTER.register(name, () -> particle);
 		}
 	}
