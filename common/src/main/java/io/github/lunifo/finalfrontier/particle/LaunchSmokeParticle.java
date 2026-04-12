@@ -1,5 +1,7 @@
 package io.github.lunifo.finalfrontier.particle;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -8,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@Environment(EnvType.CLIENT)
 public class LaunchSmokeParticle extends TextureSheetParticle {
 	private final SpriteSet spriteSet;
 
@@ -33,6 +36,7 @@ public class LaunchSmokeParticle extends TextureSheetParticle {
 		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 
+	@Environment(EnvType.CLIENT)
 	public static class Provider implements ParticleProvider<SimpleParticleType> {
 		private final SpriteSet spriteSet;
 
