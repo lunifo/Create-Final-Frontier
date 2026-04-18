@@ -99,12 +99,12 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 
 	@Override
 	public void disassemble() {
-		super.disassemble();
 		for (var passenger : getPassengers()) {
 			if (passenger instanceof RocketPartContraptionEntity rocketPartEntity) {
 				rocketPartEntity.disassemble();
 			}
 		}
+		super.disassemble();
 	}
 
 	@Override
