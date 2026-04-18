@@ -1,21 +1,46 @@
 package io.github.lunifo.finalfrontier.behaviour.interaction;
 
+import com.google.common.base.Objects;
+import com.simibubi.create.AllItems;
 import com.simibubi.create.api.behaviour.interaction.MovingInteractionBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.actors.trainControls.ControlsHandler;
+import com.simibubi.create.foundation.utility.AdventureUtil;
+import com.tterrag.registrate.fabric.EnvExecutor;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraptionEntity;
+import net.fabricmc.api.EnvType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 public class ShipControlsBehaviour extends MovingInteractionBehaviour {
 	@Override
 	public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
-		if (contraptionEntity instanceof RocketPartContraptionEntity rocketPartEntity) {
-			if (rocketPartEntity.isInFlight()) {
-				rocketPartEntity.stage();
-			} else {
-				rocketPartEntity.startFlight();
+		if (contraptionEntity instanceof RocketPartContraptionEntity) {
+			// Exact same as ControlsInteractionBehaviour's implementation
+			if (AdventureUtil.isAdventure(player))
+				return false;
+			if (AllItems.WRENCH.isIn(player.getItemInHand(activeHand)))
+				return false;
+
+			UUID currentlyControlling = contraptionEntity.getControllingPlayer()
+					.orElse(null);
+
+			if (currentlyControlling != null) {
+				contraptionEntity.stopControlling(localPos);
+				if (Objects.equal(currentlyControlling, player.getUUID()))
+					return true;
 			}
+
+			if (!contraptionEntity.startControlling(localPos, player))
+				return false;
+
+			contraptionEntity.setControllingPlayer(player.getUUID());
+			if (player.level().isClientSide)
+				EnvExecutor.runWhenOn(EnvType.CLIENT,
+						() -> () -> ControlsHandler.startControlling(contraptionEntity, localPos));
 			return true;
 		}
 		return false;

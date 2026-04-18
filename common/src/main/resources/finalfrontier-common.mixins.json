@@ -6,6 +6,7 @@
   "client": [
   ],
   "mixins": [
+    "ControlsInteractionBehaviourMixin"
   ],
   "injectors": {
     "defaultRequire": 1

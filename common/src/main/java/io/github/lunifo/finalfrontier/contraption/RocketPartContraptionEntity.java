@@ -12,14 +12,20 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 public class RocketPartContraptionEntity extends AbstractContraptionEntity {
-	boolean inFlight = false;
+	private static final EntityDataAccessor<Boolean> IN_FLIGHT = SynchedEntityData.defineId(RocketPartContraptionEntity.class, EntityDataSerializers.BOOLEAN);
 
 	public Orientation orientation = new Orientation();
 	private Orientation prevOrientation = new Orientation();
@@ -44,9 +50,15 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	}
 
 	@Override
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(IN_FLIGHT, false);
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
-		if (inFlight) {
+		if (isInFlight()) {
 			setContraptionMotion(getDeltaMovement().add(new Vec3(0, .0005, 0)));
 			Vec3 velocity = getDeltaMovement();
 			move(velocity.x, velocity.y, velocity.z);
@@ -56,7 +68,7 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 				if (initialPos != null) {
 					Vec3 initialVec = Vec3.atBottomCenterOf(initialPos);
 					teleportTo(initialVec.x, initialVec.y, initialVec.z);
-					inFlight = false;
+					entityData.set(IN_FLIGHT, false);
 					if (!level().isClientSide()) {
 						disassemble();
 					}
@@ -94,7 +106,7 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	}
 
 	public boolean isInFlight() {
-		return inFlight;
+		return entityData.get(IN_FLIGHT);
 	}
 
 	@Override
@@ -200,9 +212,39 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	}
 
 	@Override
+	public boolean startControlling(BlockPos controlsLocalPos, Player player) {
+		return player != null && !player.isSpectator();
+	}
+
+	boolean staging;
+	@Override
+	public boolean control(BlockPos controlsLocalPos, Collection<Integer> heldControls, Player player) {
+		if (level().isClientSide)
+			return true;
+		if (heldControls.contains(5))
+			return false;
+
+		if (heldControls.contains(4)) {
+			if (isInFlight()) {
+				if (!staging) {
+					staging = true;
+					stage();
+				}
+			} else {
+				staging = true;
+				startFlight();
+			}
+		} else if (staging) {
+			staging = false;
+		}
+
+		return true;
+	}
+
+	@Override
 	protected void readAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.readAdditional(compound, spawnPacket);
-		inFlight = compound.getBoolean("InFlight");
+		entityData.set(IN_FLIGHT, compound.getBoolean("InFlight"));
 
 		// Temporary variable for testing
 		int[] initialPosArray = compound.getIntArray("InitialPos");
@@ -218,7 +260,7 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	@Override
 	protected void writeAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.writeAdditional(compound, spawnPacket);
-		compound.putBoolean("InFlight", inFlight);
+		compound.putBoolean("InFlight", isInFlight());
 
 		// Temporary variable for testing
 		if (initialPos != null) {
@@ -228,7 +270,7 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	}
 
 	public void startFlight() {
-		inFlight = true;
+		entityData.set(IN_FLIGHT, true);
 	}
 
 	public static class Orientation {
