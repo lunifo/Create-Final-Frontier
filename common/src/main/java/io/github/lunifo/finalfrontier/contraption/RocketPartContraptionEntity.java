@@ -82,7 +82,10 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			}
 		}
 
-		prevOrientation = orientation.copy();
+		if (getVehicle() == null) {
+			prevOrientation = orientation.copy();
+			// Change orientation here
+		}
 	}
 
 	public void detach() {
@@ -190,6 +193,15 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			return globalAnchorVec.subtract(0, 0.5, 0);
 		} else {
 			return super.getPassengerPosition(passenger, partialTicks);
+		}
+	}
+
+	@Override
+	public void positionRider(Entity passenger, MoveFunction callback) {
+		super.positionRider(passenger, callback);
+		if (passenger instanceof RocketPartContraptionEntity rocketPart) {
+			rocketPart.orientation = orientation;
+			rocketPart.prevOrientation = prevOrientation;
 		}
 	}
 
