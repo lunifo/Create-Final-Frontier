@@ -6,7 +6,8 @@
   "client": [
   ],
   "mixins": [
-    "ControlsInteractionBehaviourMixin"
+    "ControlsInteractionBehaviourMixin",
+    "EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

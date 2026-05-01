@@ -6,6 +6,7 @@ import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.StructureTransform;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
+import io.github.lunifo.finalfrontier.EntityCrossDimensionPassengerTeleportation;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -23,6 +25,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 
 public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	private static final EntityDataAccessor<Boolean> IN_FLIGHT = SynchedEntityData.defineId(RocketPartContraptionEntity.class, EntityDataSerializers.BOOLEAN);
@@ -65,13 +69,12 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 
 			// Temporary test flight
 			if (getY() > 256) {
-				if (initialPos != null) {
-					Vec3 initialVec = Vec3.atBottomCenterOf(initialPos);
-					teleportTo(initialVec.x, initialVec.y, initialVec.z);
-					entityData.set(IN_FLIGHT, false);
-					if (!level().isClientSide()) {
-						disassemble();
-					}
+				if (!level().isClientSide) {
+					ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(Level.NETHER);
+					assert nether != null;
+					RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(nether, 0, 200, 0, Set.of(), 0, 0);
+					newEntity.entityData.set(IN_FLIGHT, false);
+					newEntity.disassemble();
 				}
 			}
 		}
