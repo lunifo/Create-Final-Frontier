@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,7 +28,7 @@ public abstract class EntityMixin implements EntityCrossDimensionPassengerTelepo
 	@Shadow private Vec3 position;
 
 	@Unique
-	public Entity finalfrontier$teleportSelfAndPassengersTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float g, float h) {
+	public Entity finalfrontier$teleportSelfAndPassengersTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float g, float h, @Nullable Entity newVehicle) {
 		Entity newEntity = this.getType().create(level);
 		if (newEntity == null) {
 			return null;
@@ -42,6 +43,11 @@ public abstract class EntityMixin implements EntityCrossDimensionPassengerTelepo
 		this.setRemoved(Entity.RemovalReason.CHANGED_DIMENSION);
 		level.addDuringTeleport(newEntity);
 
+		if (newVehicle != null) {
+			newEntity.startRiding(newVehicle);
+			newVehicle.positionRider(newEntity);
+		}
+
 		for (var passenger: passengers) {
 			// Players need to be handled differently
 			if (passenger instanceof ServerPlayer playerPassenger) {
@@ -50,7 +56,7 @@ public abstract class EntityMixin implements EntityCrossDimensionPassengerTelepo
 				continue;
 			}
 			Vec3 passengerOffset = position.subtract(passenger.position());
-			Entity newPassenger = ((EntityCrossDimensionPassengerTeleportation) passenger)
+			((EntityCrossDimensionPassengerTeleportation) passenger)
 					.finalfrontier$teleportSelfAndPassengersTo(
 							level,
 							x + passengerOffset.x,
@@ -58,9 +64,9 @@ public abstract class EntityMixin implements EntityCrossDimensionPassengerTelepo
 							z + passengerOffset.z,
 							relativeMovements,
 							passenger.getYRot(),
-							passenger.getXRot()
+							passenger.getXRot(),
+							newEntity
 					);
-			newPassenger.startRiding(newEntity);
 		}
 
 		return newEntity;
