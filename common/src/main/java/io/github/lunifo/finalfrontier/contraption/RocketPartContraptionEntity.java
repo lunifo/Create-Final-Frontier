@@ -72,7 +72,17 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 				if (!level().isClientSide) {
 					ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(Level.NETHER);
 					assert nether != null;
-					RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(nether, 0, 200, 0, Set.of(), 0, 0, null);
+					RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
+							nether,
+							0,
+							200,
+							0,
+							Set.of(),
+							0,
+							0,
+							null,
+							null
+					);
 					newEntity.entityData.set(IN_FLIGHT, false);
 					newEntity.disassemble();
 				}
