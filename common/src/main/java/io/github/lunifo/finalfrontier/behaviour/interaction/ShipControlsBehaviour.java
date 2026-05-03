@@ -7,6 +7,7 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.actors.trainControls.ControlsHandler;
 import com.simibubi.create.foundation.utility.AdventureUtil;
 import com.tterrag.registrate.fabric.EnvExecutor;
+import io.github.lunifo.finalfrontier.PlatformHelper;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraptionEntity;
 import net.fabricmc.api.EnvType;
 import net.minecraft.core.BlockPos;
@@ -39,8 +40,7 @@ public class ShipControlsBehaviour extends MovingInteractionBehaviour {
 
 			contraptionEntity.setControllingPlayer(player.getUUID());
 			if (player.level().isClientSide)
-				EnvExecutor.runWhenOn(EnvType.CLIENT,
-						() -> () -> ControlsHandler.startControlling(contraptionEntity, localPos));
+				PlatformHelper.executeOnClient(() -> () -> ControlsHandler.startControlling(contraptionEntity, localPos));
 			return true;
 		}
 		return false;

@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -30,6 +31,10 @@ public class PlatformHelperImpl {
 
 	public static PlatformHelper.ParticleRegistrationHelper particleRegistrationHelper() {
 		return ParticleRegistrationHelperForge.INSTANCE;
+	}
+
+	public static void executeOnClient(Supplier<Runnable> runnableSupplier) {
+		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, runnableSupplier);
 	}
 
 	public static class ParticleRegistrationHelperForge implements PlatformHelper.ParticleRegistrationHelper {

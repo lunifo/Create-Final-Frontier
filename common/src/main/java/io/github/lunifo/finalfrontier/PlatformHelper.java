@@ -7,7 +7,6 @@ import com.tterrag.registrate.builders.EntityBuilder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -23,6 +22,11 @@ public class PlatformHelper {
 
 	@ExpectPlatform
 	public static ParticleRegistrationHelper particleRegistrationHelper() {
+		throw new AssertionError();
+	}
+
+	@ExpectPlatform
+	public static void executeOnClient(Supplier<Runnable> runnableSupplier) {
 		throw new AssertionError();
 	}
 

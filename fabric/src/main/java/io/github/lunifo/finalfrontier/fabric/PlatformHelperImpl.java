@@ -5,6 +5,7 @@ import com.simibubi.create.content.contraptions.render.ContraptionVisual;
 import com.simibubi.create.foundation.data.CreateEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.EntityBuilder;
+import com.tterrag.registrate.fabric.EnvExecutor;
 import io.github.lunifo.finalfrontier.FinalFrontier;
 import io.github.lunifo.finalfrontier.PlatformHelper;
 import net.fabricmc.api.EnvType;
@@ -28,6 +29,10 @@ public class PlatformHelperImpl {
 
 	public static PlatformHelper.ParticleRegistrationHelper particleRegistrationHelper() {
 		return ParticleRegistrationHelperFabric.INSTANCE;
+	}
+
+	public static void executeOnClient(Supplier<Runnable> runnableSupplier) {
+		EnvExecutor.runWhenOn(EnvType.CLIENT, runnableSupplier);
 	}
 
 	public static class ParticleRegistrationHelperFabric implements PlatformHelper.ParticleRegistrationHelper {
