@@ -5,6 +5,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 
@@ -20,7 +21,12 @@ public class FinalFrontierForge {
         eventBus.addListener(FinalFrontierForge::onRegister);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener(PlatformHelperImpl.ParticleRegistrationHelperForge::registerClient);
+            eventBus.addListener(FinalFrontierForge::onClientInit);
         });
+    }
+
+    private static void onClientInit(FMLClientSetupEvent event) {
+        FinalFrontier.clientInit();
     }
 
     private static void onRegister(RegisterEvent event) {

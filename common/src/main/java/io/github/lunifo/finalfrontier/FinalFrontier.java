@@ -6,6 +6,10 @@ import io.github.lunifo.finalfrontier.block.FinalFrontierBlocks;
 import io.github.lunifo.finalfrontier.contraption.FinalFrontierContraptionTypes;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
 import io.github.lunifo.finalfrontier.particle.FinalFrontierParticleTypes;
+import io.github.lunifo.finalfrontier.ponder.FinalFrontierPonderPlugin;
+import net.createmod.ponder.foundation.PonderIndex;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,11 @@ public class FinalFrontier {
 
     public static void registerCreateDependent() {
         FinalFrontierContraptionTypes.init();
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void clientInit() {
+        PonderIndex.addPlugin(new FinalFrontierPonderPlugin());
     }
 
     public static ResourceLocation id(String path) {
