@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "finalfrontier:block/ship_controls"
+    }
+  }
+}

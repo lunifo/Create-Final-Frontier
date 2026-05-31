@@ -1,0 +1,6 @@
+{
+  "block.finalfrontier.engine": "Engine",
+  "block.finalfrontier.ship_controls": "Ship Controls",
+  "block.finalfrontier.stage_decoupler": "Stage Decoupler",
+  "entity.finalfrontier.rocket_part": "Rocket Part"
+}

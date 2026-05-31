@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "finalfrontier:block/ship_controls_bottom",
+    "side": "finalfrontier:block/ship_controls_side",
+    "top": "finalfrontier:block/ship_controls_top"
+  }
+}

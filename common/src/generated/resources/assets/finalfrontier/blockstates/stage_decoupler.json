@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "finalfrontier:block/stage_decoupler",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "finalfrontier:block/stage_decoupler",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "finalfrontier:block/stage_decoupler",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "finalfrontier:block/stage_decoupler",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "finalfrontier:block/stage_decoupler"
+    },
+    "facing=west": {
+      "model": "finalfrontier:block/stage_decoupler",
+      "x": 90,
+      "y": 270
+    }
+  }
+}
