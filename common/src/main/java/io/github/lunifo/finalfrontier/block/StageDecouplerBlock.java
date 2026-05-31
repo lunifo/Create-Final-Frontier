@@ -20,6 +20,7 @@ public class StageDecouplerBlock extends WrenchableDirectionalBlock {
 	@Override
 	public @Nullable BlockState getStateForPlacement(@NotNull BlockPlaceContext blockPlaceContext) {
 		BlockState state = Objects.requireNonNull(super.getStateForPlacement(blockPlaceContext), "We're most likely dealing with some incautious modder.");
+		state = state.setValue(FACING, state.getValue(FACING).getOpposite());
 		BlockPos placementPos = blockPlaceContext.getClickedPos();
 		Level level = blockPlaceContext.getLevel();
 
