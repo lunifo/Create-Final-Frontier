@@ -2,5 +2,8 @@
   "block.finalfrontier.engine": "Engine",
   "block.finalfrontier.ship_controls": "Ship Controls",
   "block.finalfrontier.stage_decoupler": "Stage Decoupler",
-  "entity.finalfrontier.rocket_part": "Rocket Part"
+  "entity.finalfrontier.rocket_part": "Rocket Part",
+  "finalfrontier.ponder.ship_controls.header": "Using Ship Controls",
+  "finalfrontier.ponder.ship_controls.text_1": "First glue your rocket together",
+  "finalfrontier.ponder.ship_controls.text_2": "Assemble the rocket by clicking the ship controls"
 }
