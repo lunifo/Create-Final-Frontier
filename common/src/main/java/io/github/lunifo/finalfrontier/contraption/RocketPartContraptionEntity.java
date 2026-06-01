@@ -5,8 +5,10 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.StructureTransform;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
+import io.github.lunifo.finalfrontier.dimension.FinalFrontierDimensions;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
 import io.github.lunifo.finalfrontier.EntityCrossDimensionPassengerTeleportation;
+import io.github.lunifo.finalfrontier.util.PlayerUtil;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
@@ -68,14 +70,14 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			move(velocity.x, velocity.y, velocity.z);
 
 			// Temporary test flight
-			if (getY() > 256) {
+			if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
 				if (!level().isClientSide) {
-					ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(Level.NETHER);
+					ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(FinalFrontierDimensions.DEEP_SPACE);
 					assert nether != null;
 					RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
 							nether,
 							0,
-							200,
+							100,
 							0,
 							Set.of(),
 							0,
