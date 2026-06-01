@@ -1,0 +1,13 @@
+{
+  "type": "finalfrontier:deep_space",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "finalfrontier:deep_space",
+      "lakes": false,
+      "features": false,
+      "layers": [],
+      "structure_overrides": []
+    }
+  }
+}
