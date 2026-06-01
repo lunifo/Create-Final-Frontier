@@ -39,9 +39,6 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	private int despawnTicks;
 	private boolean isDetached;
 
-	// Temporary variable for testing
-	BlockPos initialPos;
-
 	public RocketPartContraptionEntity(EntityType<?> type, Level world) {
 		super(type, world);
 	}
@@ -50,8 +47,6 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		RocketPartContraptionEntity rocketPartEntity = new RocketPartContraptionEntity(FinalFrontierEntityTypes.ROCKET_PART.get(), level);
 		rocketPartEntity.setContraption(contraption);
 
-		// Temporary variable for testing
-		rocketPartEntity.initialPos = contraption.anchor;
 		return rocketPartEntity;
 	}
 
@@ -69,7 +64,6 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			Vec3 velocity = getDeltaMovement();
 			move(velocity.x, velocity.y, velocity.z);
 
-			// Temporary test flight
 			if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
 				if (!level().isClientSide) {
 					ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(FinalFrontierDimensions.DEEP_SPACE);
@@ -272,28 +266,12 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	protected void readAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.readAdditional(compound, spawnPacket);
 		entityData.set(IN_FLIGHT, compound.getBoolean("InFlight"));
-
-		// Temporary variable for testing
-		int[] initialPosArray = compound.getIntArray("InitialPos");
-		if (initialPosArray.length != 0) {
-			initialPos = new BlockPos(
-					initialPosArray[0],
-					initialPosArray[1],
-					initialPosArray[2]
-			);
-		}
 	}
 
 	@Override
 	protected void writeAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.writeAdditional(compound, spawnPacket);
 		compound.putBoolean("InFlight", isInFlight());
-
-		// Temporary variable for testing
-		if (initialPos != null) {
-			int[] initialPosArray = {initialPos.getX(), initialPos.getY(), initialPos.getZ()};
-			compound.putIntArray("InitialPos", initialPosArray);
-		}
 	}
 
 	public void startFlight() {
