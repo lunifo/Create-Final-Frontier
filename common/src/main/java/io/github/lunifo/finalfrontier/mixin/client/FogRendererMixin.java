@@ -1,4 +1,4 @@
-package io.github.lunifo.finalfrontier.mixin;
+package io.github.lunifo.finalfrontier.mixin.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.lunifo.finalfrontier.util.PlayerUtil;
