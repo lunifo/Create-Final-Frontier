@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class RocketPartContraptionEntity extends AbstractContraptionEntity {
-	private static final EntityDataAccessor<Boolean> IN_FLIGHT = SynchedEntityData.defineId(RocketPartContraptionEntity.class, EntityDataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Float> THROTTLE = SynchedEntityData.defineId(RocketPartContraptionEntity.class, EntityDataSerializers.FLOAT);
 
 	public Orientation orientation = new Orientation();
 	private Orientation prevOrientation = new Orientation();
@@ -53,35 +53,34 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
-		this.entityData.define(IN_FLIGHT, false);
+		this.entityData.define(THROTTLE, 0.0F);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
-		if (isInFlight()) {
-			setContraptionMotion(getDeltaMovement().add(new Vec3(0, .0005, 0)));
-			Vec3 velocity = getDeltaMovement();
-			move(velocity.x, velocity.y, velocity.z);
 
-			if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
-				if (!level().isClientSide) {
-					ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(FinalFrontierDimensions.DEEP_SPACE);
-					assert nether != null;
-					RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
-							nether,
-							0,
-							100,
-							0,
-							Set.of(),
-							0,
-							0,
-							null,
-							null
-					);
-					newEntity.entityData.set(IN_FLIGHT, false);
-					newEntity.disassemble();
-				}
+		applyForces();
+		Vec3 velocity = getDeltaMovement().multiply(0.05, 0.05, 0.05);
+		move(velocity.x, velocity.y, velocity.z);
+
+		if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
+			if (!level().isClientSide) {
+				ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(FinalFrontierDimensions.DEEP_SPACE);
+				assert nether != null;
+				RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
+						nether,
+						0,
+						100,
+						0,
+						Set.of(),
+						0,
+						0,
+						null,
+						null
+				);
+				newEntity.entityData.set(THROTTLE, 0.0F);
+				newEntity.disassemble();
 			}
 		}
 
@@ -95,6 +94,15 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			prevOrientation = orientation.copy();
 			// Change orientation here
 		}
+	}
+
+	private void applyForces() {
+		float throttle = getThrottle();
+		Vec3 engineAcceleration = new Vec3(0, 0.7, 0).multiply(throttle, throttle, throttle);
+		Vec3 gravityAcceleration = new Vec3(0, (-9.81) / 20, 0);
+		Vec3 acceleration = engineAcceleration.add(gravityAcceleration);
+		Vec3 newVelocity = getDeltaMovement().add(acceleration);
+		setContraptionMotion(newVelocity);
 	}
 
 	public void detach() {
@@ -117,8 +125,12 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		}
 	}
 
-	public boolean isInFlight() {
-		return entityData.get(IN_FLIGHT);
+	public float getThrottle() {
+		return entityData.get(THROTTLE);
+	}
+
+	public void setThrottle(float throttle) {
+		entityData.set(THROTTLE, throttle);
 	}
 
 	@Override
@@ -242,21 +254,18 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	public boolean control(BlockPos controlsLocalPos, Collection<Integer> heldControls, Player player) {
 		if (level().isClientSide)
 			return true;
-		if (heldControls.contains(5))
-			return false;
 
-		if (heldControls.contains(4)) {
-			if (isInFlight()) {
-				if (!staging) {
-					staging = true;
-					stage();
-				}
-			} else {
-				staging = true;
-				startFlight();
-			}
+		if (heldControls.contains(5)) {
+			staging = true;
+			stage();
 		} else if (staging) {
 			staging = false;
+		}
+
+		if (heldControls.contains(4)) {
+			setThrottle(1);
+		} else {
+			setThrottle(0);
 		}
 
 		return true;
@@ -265,17 +274,13 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	@Override
 	protected void readAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.readAdditional(compound, spawnPacket);
-		entityData.set(IN_FLIGHT, compound.getBoolean("InFlight"));
+		entityData.set(THROTTLE, compound.getFloat("Throttle"));
 	}
 
 	@Override
 	protected void writeAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.writeAdditional(compound, spawnPacket);
-		compound.putBoolean("InFlight", isInFlight());
-	}
-
-	public void startFlight() {
-		entityData.set(IN_FLIGHT, true);
+		compound.putFloat("InFlight", getThrottle());
 	}
 
 	public static class Orientation {
