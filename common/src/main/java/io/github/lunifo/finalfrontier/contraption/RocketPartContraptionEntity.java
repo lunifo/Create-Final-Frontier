@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -63,6 +64,12 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		applyForces();
 		Vec3 velocity = getDeltaMovement().multiply(0.05, 0.05, 0.05);
 		move(velocity.x, velocity.y, velocity.z);
+
+		BlockPos collisionPos = terrainCollisionPos();
+		if (collisionPos != null) {
+			setContraptionMotion(Vec3.ZERO);
+			setPos(collisionPos.getCenter().add(0, 0.5, 0));
+		}
 
 		if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
 			if (!level().isClientSide) {
@@ -103,6 +110,16 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		Vec3 acceleration = engineAcceleration.add(gravityAcceleration);
 		Vec3 newVelocity = getDeltaMovement().add(acceleration);
 		setContraptionMotion(newVelocity);
+	}
+
+	@Nullable
+	private BlockPos terrainCollisionPos() {
+		BlockPos pos = BlockPos.containing(position().add(0, contraption.bounds.minY, 0));
+		if (level().getBlockState(pos).isAir()) {
+			return null;
+		} else {
+			return BlockPos.containing(position());
+		}
 	}
 
 	public void detach() {
