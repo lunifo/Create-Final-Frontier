@@ -61,6 +61,17 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	public void tick() {
 		super.tick();
 
+		if (level().dimension() == FinalFrontierDimensions.DEEP_SPACE && !level().isClientSide) {
+			ServerLevel overworld = Objects.requireNonNull(level().getServer()).overworld();
+			((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
+					overworld,
+					0.5, 511, 0.5,
+					Set.of(),
+					0, 0,
+					null, null
+			);
+		}
+
 		applyForces();
 		Vec3 velocity = getDeltaMovement().multiply(0.05, 0.05, 0.05);
 		move(velocity.x, velocity.y, velocity.z);
