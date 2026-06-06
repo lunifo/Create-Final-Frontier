@@ -5,7 +5,7 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.StructureTransform;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
-import io.github.lunifo.finalfrontier.dimension.FinalFrontierDimensions;
+import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
 import io.github.lunifo.finalfrontier.EntityCrossDimensionPassengerTeleportation;
 import io.github.lunifo.finalfrontier.util.PlayerUtil;

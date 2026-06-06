@@ -1,4 +1,4 @@
-package io.github.lunifo.finalfrontier.dimension;
+package io.github.lunifo.finalfrontier.worldgen.dimension;
 
 import io.github.lunifo.finalfrontier.FinalFrontier;
 import net.minecraft.core.registries.Registries;

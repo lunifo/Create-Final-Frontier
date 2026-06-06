@@ -1,6 +1,6 @@
 package io.github.lunifo.finalfrontier.util;
 
-import io.github.lunifo.finalfrontier.dimension.FinalFrontierDimensions;
+import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
