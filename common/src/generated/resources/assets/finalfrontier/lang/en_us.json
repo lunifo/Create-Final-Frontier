@@ -1,5 +1,7 @@
 {
   "block.finalfrontier.engine": "Engine",
+  "block.finalfrontier.moon_regolith": "Moon Regolith",
+  "block.finalfrontier.moon_stone": "Moon Stone",
   "block.finalfrontier.ship_controls": "Ship Controls",
   "block.finalfrontier.stage_decoupler": "Stage Decoupler",
   "entity.finalfrontier.rocket_part": "Rocket Part",
