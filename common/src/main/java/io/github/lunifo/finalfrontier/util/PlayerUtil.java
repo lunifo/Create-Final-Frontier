@@ -17,7 +17,7 @@ public abstract class PlayerUtil {
 		}
 
 		ResourceKey<Level> dimensionKey = player.level().dimension();
-		if (dimensionKey == FinalFrontierDimensions.DEEP_SPACE) {
+		if (dimensionKey == FinalFrontierDimensions.DEEP_SPACE || dimensionKey == FinalFrontierDimensions.MOON) {
 			return 1;
 		}
 
