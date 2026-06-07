@@ -1,7 +1,10 @@
 package io.github.lunifo.finalfrontier.forge;
 
 import io.github.lunifo.finalfrontier.FinalFrontier;
+import io.github.lunifo.finalfrontier.registry.SimpleDynamicRegistry;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +22,7 @@ public class FinalFrontierForge {
 
         PlatformHelperImpl.ParticleRegistrationHelperForge.register(eventBus);
         eventBus.addListener(FinalFrontierForge::onRegister);
+        MinecraftForge.EVENT_BUS.addListener(FinalFrontierForge::addReloadListeners);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener(PlatformHelperImpl.ParticleRegistrationHelperForge::registerClient);
             eventBus.addListener(FinalFrontierForge::onClientInit);
@@ -31,5 +35,9 @@ public class FinalFrontierForge {
 
     private static void onRegister(RegisterEvent event) {
         FinalFrontier.registerCreateDependent();
+    }
+
+    private static void addReloadListeners(AddReloadListenerEvent event) {
+        SimpleDynamicRegistry.registerAll((id, registry) -> event.addListener(registry));
     }
 }
