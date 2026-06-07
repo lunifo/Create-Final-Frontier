@@ -1,5 +1,6 @@
 package io.github.lunifo.finalfrontier.util;
 
+import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
 import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
@@ -17,7 +18,7 @@ public abstract class PlayerUtil {
 		}
 
 		ResourceKey<Level> dimensionKey = player.level().dimension();
-		if (dimensionKey == FinalFrontierDimensions.DEEP_SPACE || dimensionKey == FinalFrontierDimensions.MOON) {
+		if (dimensionKey == FinalFrontierDimensions.DEEP_SPACE || (CelestialBody.DIMENSION_LOOKUP.containsKey(dimensionKey) && !CelestialBody.DIMENSION_LOOKUP.get(dimensionKey).hasAtmosphere())) {
 			return 1;
 		}
 

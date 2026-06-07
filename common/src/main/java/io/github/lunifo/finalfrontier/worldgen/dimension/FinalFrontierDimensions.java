@@ -8,7 +8,6 @@ import net.minecraft.world.level.Level;
 
 public class FinalFrontierDimensions {
 	public static final ResourceKey<Level> DEEP_SPACE = create("deep_space");
-	public static final ResourceKey<Level> MOON = create("moon");
 
 	private static ResourceKey<Level> create(String name) {
 		return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(FinalFrontier.MOD_ID, name));
