@@ -1,0 +1,7 @@
+{
+  "type": "finalfrontier:crater",
+  "config": {
+    "depth": 10,
+    "radius": 10
+  }
+}

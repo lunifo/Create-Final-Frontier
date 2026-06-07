@@ -7,6 +7,7 @@ import io.github.lunifo.finalfrontier.contraption.FinalFrontierContraptionTypes;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
 import io.github.lunifo.finalfrontier.particle.FinalFrontierParticleTypes;
 import io.github.lunifo.finalfrontier.ponder.FinalFrontierPonderPlugin;
+import io.github.lunifo.finalfrontier.worldgen.feature.FinalFrontierWorldgenFeatures;
 import net.createmod.ponder.foundation.PonderIndex;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,6 +27,7 @@ public class FinalFrontier {
         FinalFrontierBlocks.init();
         FinalFrontierEntityTypes.init();
         FinalFrontierParticleTypes.init();
+        FinalFrontierWorldgenFeatures.init();
     }
 
     public static void registerCreateDependent() {
