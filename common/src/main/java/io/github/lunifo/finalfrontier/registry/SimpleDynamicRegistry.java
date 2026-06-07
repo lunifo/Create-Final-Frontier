@@ -13,11 +13,13 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import java.io.Reader;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class SimpleDynamicRegistry<T> implements ResourceManagerReloadListener {
 	private final String folder;
 	private final Codec<T> codec;
 	private final Map<ResourceLocation, T> entries = new HashMap<>();
+	private final List<Consumer<SimpleDynamicRegistry<T>>> listeners = new ArrayList<>();
 
 	private static final Map<String, SimpleDynamicRegistry<?>> ALL = new HashMap<>();
 
@@ -51,6 +53,12 @@ public class SimpleDynamicRegistry<T> implements ResourceManagerReloadListener {
 				FinalFrontier.LOGGER.error("Failed to load dynamic registry entry '{}' from folder '{}'", location, folder);
 			}
 		}
+
+		listeners.forEach(listener -> listener.accept(this));
+	}
+
+	public void addListener(Consumer<SimpleDynamicRegistry<T>> listener) {
+		listeners.add(listener);
 	}
 
 	public boolean contains(ResourceLocation location) {
