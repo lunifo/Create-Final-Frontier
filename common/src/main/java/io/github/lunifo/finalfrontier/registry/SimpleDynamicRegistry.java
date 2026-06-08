@@ -100,4 +100,17 @@ public class SimpleDynamicRegistry<T> implements ResourceManagerReloadListener {
 	public Map<ResourceLocation, T> entries() {
 		return entries;
 	}
+
+	public Codec<T> byResourceLocationCodec() {
+		return ResourceLocation.CODEC.flatXmap(
+				DataResult.partialGet(this::get, () -> "Dynamic registry " + folder + " has no entry for key "),
+				value -> entries
+						.entrySet()
+						.stream()
+						.filter(entry -> value.equals(entry.getValue()))
+						.findFirst()
+						.map(entry -> DataResult.success(entry.getKey()))
+						.orElseGet(() -> DataResult.error(() -> "Dynamic registry " + folder + " does not contain the entry " + value.toString()))
+		);
+	}
 }

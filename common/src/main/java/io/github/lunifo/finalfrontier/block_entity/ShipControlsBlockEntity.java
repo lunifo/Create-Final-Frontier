@@ -23,7 +23,7 @@ public class ShipControlsBlockEntity extends BlockEntity {
 	@Override
 	protected void saveAdditional(@NotNull CompoundTag compoundTag) {
 		if (getCurrentCelestialBody() != null) {
-			DataResult<Tag> result = CelestialBody.CODEC.encodeStart(NbtOps.INSTANCE, getCurrentCelestialBody());
+			DataResult<Tag> result = CelestialBody.CELESTIAL_BODIES.byResourceLocationCodec().encodeStart(NbtOps.INSTANCE, getCurrentCelestialBody());
 			result.resultOrPartial(FinalFrontier.LOGGER::error).ifPresent(tag -> compoundTag.put("CelestialBody", tag));
 		}
 
@@ -36,7 +36,7 @@ public class ShipControlsBlockEntity extends BlockEntity {
 
 		Tag serializedCelestialBody = compoundTag.get("CelestialBody");
 		if (serializedCelestialBody != null) {
-			DataResult<CelestialBody> result = CelestialBody.CODEC.parse(NbtOps.INSTANCE, serializedCelestialBody);
+			DataResult<CelestialBody> result = CelestialBody.CELESTIAL_BODIES.byResourceLocationCodec().parse(NbtOps.INSTANCE, serializedCelestialBody);
 			result.resultOrPartial(FinalFrontier.LOGGER::error).ifPresent(this::setCurrentCelestialBody);
 		}
 	}
