@@ -3,6 +3,7 @@ package io.github.lunifo.finalfrontier;
 import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import io.github.lunifo.finalfrontier.block.FinalFrontierBlocks;
+import io.github.lunifo.finalfrontier.block_entity.FinalFrontierBlockEntityTypes;
 import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
 import io.github.lunifo.finalfrontier.contraption.FinalFrontierContraptionTypes;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
@@ -29,6 +30,7 @@ public class FinalFrontier {
         FinalFrontierEntityTypes.init();
         FinalFrontierParticleTypes.init();
         FinalFrontierWorldgenFeatures.init();
+        FinalFrontierBlockEntityTypes.init();
 
         CelestialBody.init();
     }
