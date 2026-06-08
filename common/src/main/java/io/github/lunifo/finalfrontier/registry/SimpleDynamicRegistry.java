@@ -38,23 +38,32 @@ public class SimpleDynamicRegistry<T> implements ResourceManagerReloadListener {
 	public void onResourceManagerReload(ResourceManager resourceManager) {
 		entries.clear();
 
-		for (ResourceLocation location : resourceManager.listResources(folder, path -> path.toString().endsWith(".json")).keySet()) {
-			try(Reader reader = resourceManager.openAsReader(location)) {
+		for (ResourceLocation rawLocation : resourceManager.listResources(folder, path -> path.toString().endsWith(".json")).keySet()) {
+			try(Reader reader = resourceManager.openAsReader(rawLocation)) {
 				JsonElement json = JsonParser.parseReader(reader);
 				DataResult<T> result = codec.parse(JsonOps.INSTANCE, json);
 				result.resultOrPartial(FinalFrontier.LOGGER::error).ifPresent(newValue -> {
 					try {
-						put(newValue, location);
+						put(newValue, refineResourceLocation(rawLocation));
 					} catch (IllegalArgumentException e) {
 						FinalFrontier.LOGGER.error("Found duplicate entry: {}", e.toString());
 					}
 				});
 			} catch (Exception e) {
-				FinalFrontier.LOGGER.error("Failed to load dynamic registry entry '{}' from folder '{}'", location, folder);
+				FinalFrontier.LOGGER.error("Failed to load dynamic registry entry '{}' from folder '{}'", rawLocation, folder);
 			}
 		}
 
 		listeners.forEach(listener -> listener.accept(this));
+	}
+
+	private ResourceLocation refineResourceLocation(ResourceLocation rawLocation) {
+		String path = rawLocation.getPath();
+
+		path = path.replace(folder + "/", "");
+		path = path.replace(".json", "");
+
+		return rawLocation.withPath(path);
 	}
 
 	public void addListener(Consumer<SimpleDynamicRegistry<T>> listener) {
