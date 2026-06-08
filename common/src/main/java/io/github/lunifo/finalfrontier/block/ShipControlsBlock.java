@@ -4,6 +4,7 @@ import com.simibubi.create.content.contraptions.AssemblyException;
 import io.github.lunifo.finalfrontier.FinalFrontier;
 import io.github.lunifo.finalfrontier.block_entity.FinalFrontierBlockEntityTypes;
 import io.github.lunifo.finalfrontier.block_entity.ShipControlsBlockEntity;
+import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraption;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraptionEntity;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -36,8 +38,14 @@ public class ShipControlsBlock extends BaseEntityBlock {
 			}
 
 			try {
+				CelestialBody currentCelestialBody = null;
+				if (level.getBlockEntity(blockPos) instanceof ShipControlsBlockEntity shipControlsBlockEntity) {
+					currentCelestialBody = shipControlsBlockEntity.getCurrentCelestialBody();
+				}
+
 				RocketPartContraptionEntity rocketPartEntity = createRocketPart(blockPos, level);
 				level.addFreshEntity(rocketPartEntity);
+				rocketPartEntity.currentCelestialBody = currentCelestialBody;
 			} catch (AssemblyException e) {
 				return InteractionResult.PASS;
 			}
@@ -75,5 +83,10 @@ public class ShipControlsBlock extends BaseEntityBlock {
 	@ParametersAreNonnullByDefault
 	public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
 		return new ShipControlsBlockEntity(FinalFrontierBlockEntityTypes.SHIP_CONTROLS.get(), blockPos, blockState);
+	}
+
+	@Override
+	public @NotNull RenderShape getRenderShape(@NotNull BlockState blockState) {
+		return RenderShape.MODEL;
 	}
 }

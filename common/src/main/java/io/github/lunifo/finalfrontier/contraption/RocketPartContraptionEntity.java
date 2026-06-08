@@ -5,6 +5,10 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.StructureTransform;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
+import io.github.lunifo.finalfrontier.FinalFrontier;
+import io.github.lunifo.finalfrontier.block.FinalFrontierBlocks;
+import io.github.lunifo.finalfrontier.block_entity.ShipControlsBlockEntity;
+import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
 import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
 import io.github.lunifo.finalfrontier.entity.FinalFrontierEntityTypes;
 import io.github.lunifo.finalfrontier.EntityCrossDimensionPassengerTeleportation;
@@ -18,11 +22,13 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +45,8 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 
 	private int despawnTicks;
 	private boolean isDetached;
+
+	public CelestialBody currentCelestialBody;
 
 	public RocketPartContraptionEntity(EntityType<?> type, Level world) {
 		super(type, world);
@@ -62,9 +70,25 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		super.tick();
 
 		if (level().dimension() == FinalFrontierDimensions.DEEP_SPACE && !level().isClientSide) {
-			ServerLevel overworld = Objects.requireNonNull(level().getServer()).overworld();
+			if (currentCelestialBody == null) {
+				disassemble();
+				return;
+			}
+
+			ResourceKey<Level> dimensionKey = currentCelestialBody.dimensionKey();
+			if (dimensionKey == null) {
+				disassemble();
+				return;
+			}
+
+			ServerLevel level = Objects.requireNonNull(level().getServer()).getLevel(dimensionKey);
+			if (level == null) {
+				disassemble();
+				return;
+			}
+
 			((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
-					overworld,
+					level,
 					0.5, 511, 0.5,
 					Set.of(),
 					0, 0,
@@ -84,13 +108,13 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 
 		if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
 			if (!level().isClientSide) {
-				ServerLevel nether = Objects.requireNonNull(level().getServer()).getLevel(FinalFrontierDimensions.DEEP_SPACE);
-				assert nether != null;
+				ServerLevel space = Objects.requireNonNull(level().getServer()).getLevel(FinalFrontierDimensions.DEEP_SPACE);
+				assert space != null;
 				RocketPartContraptionEntity newEntity = (RocketPartContraptionEntity)((EntityCrossDimensionPassengerTeleportation)this).finalfrontier$teleportSelfAndPassengersTo(
-						nether,
-						0,
+						space,
+						0.5,
 						100,
-						0,
+						0.5,
 						Set.of(),
 						0,
 						0,
@@ -99,6 +123,14 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 				);
 				newEntity.entityData.set(THROTTLE, 0.0F);
 				newEntity.disassemble();
+
+				BlockPos controlsPos = BlockPos.containing(newEntity.position());
+				BlockState controlsState = space.getBlockState(controlsPos);
+				if (controlsState.is(FinalFrontierBlocks.SHIP_CONTROLS.get()) && space.getBlockEntity(controlsPos) instanceof ShipControlsBlockEntity shipControls) {
+					CelestialBody body = CelestialBody.DIMENSION_LOOKUP.get(level().dimension());
+					FinalFrontier.LOGGER.info(body.dimensionKey().toString());
+					shipControls.setCurrentCelestialBody(body);
+				}
 			}
 		}
 
