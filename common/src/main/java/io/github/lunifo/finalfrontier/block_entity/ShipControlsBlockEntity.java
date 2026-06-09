@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public class ShipControlsBlockEntity extends BlockEntity {
 	private CelestialBody currentCelestialBody;
 
@@ -48,5 +50,17 @@ public class ShipControlsBlockEntity extends BlockEntity {
 
 	public @Nullable CelestialBody getCurrentCelestialBody() {
 		return currentCelestialBody;
+	}
+
+	public CelestialBody cycleCelestialBody() {
+		List<CelestialBody> allCelestialBodies = List.copyOf(CelestialBody.CELESTIAL_BODIES.values());
+		int index = allCelestialBodies.indexOf(getCurrentCelestialBody());
+		index++;
+		if (index == allCelestialBodies.size()) {
+			index = 0;
+		}
+		CelestialBody newCelestialBody = allCelestialBodies.get(index);
+		setCurrentCelestialBody(newCelestialBody);
+		return newCelestialBody;
 	}
 }

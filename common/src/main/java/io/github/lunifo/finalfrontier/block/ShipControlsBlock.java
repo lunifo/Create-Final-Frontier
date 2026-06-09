@@ -7,8 +7,10 @@ import io.github.lunifo.finalfrontier.block_entity.ShipControlsBlockEntity;
 import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraption;
 import io.github.lunifo.finalfrontier.contraption.RocketPartContraptionEntity;
+import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -32,25 +34,28 @@ public class ShipControlsBlock extends BaseEntityBlock {
 	@ParametersAreNonnullByDefault
 	@Override
 	public @NotNull InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-		if (player.getItemInHand(interactionHand).isEmpty()) {
-			if (level.isClientSide()) {
-				return InteractionResult.SUCCESS;
-			}
-
-			try {
-				CelestialBody currentCelestialBody = null;
-				if (level.getBlockEntity(blockPos) instanceof ShipControlsBlockEntity shipControlsBlockEntity) {
-					currentCelestialBody = shipControlsBlockEntity.getCurrentCelestialBody();
+		if (level.getBlockEntity(blockPos) instanceof ShipControlsBlockEntity blockEntity) {
+			if (player.getItemInHand(interactionHand).isEmpty()) {
+				if (level.isClientSide()) {
+					return InteractionResult.SUCCESS;
 				}
 
-				RocketPartContraptionEntity rocketPartEntity = createRocketPart(blockPos, level);
-				level.addFreshEntity(rocketPartEntity);
-				rocketPartEntity.currentCelestialBody = currentCelestialBody;
-			} catch (AssemblyException e) {
-				return InteractionResult.PASS;
-			}
+				if (level.dimension() == FinalFrontierDimensions.DEEP_SPACE && player.isShiftKeyDown()) {
+					CelestialBody celestialBody = blockEntity.cycleCelestialBody();
+					player.displayClientMessage(Component.literal("Celestial Body: " + celestialBody.dimensionKey().location()), true);
+					return InteractionResult.SUCCESS;
+				}
 
-			return InteractionResult.SUCCESS;
+				try {
+					RocketPartContraptionEntity rocketPartEntity = createRocketPart(blockPos, level);
+					level.addFreshEntity(rocketPartEntity);
+					rocketPartEntity.currentCelestialBody = blockEntity.getCurrentCelestialBody();
+				} catch (AssemblyException e) {
+					return InteractionResult.PASS;
+				}
+
+				return InteractionResult.SUCCESS;
+			}
 		}
 		return super.use(blockState, level, blockPos, player, interactionHand, blockHitResult);
 	}
