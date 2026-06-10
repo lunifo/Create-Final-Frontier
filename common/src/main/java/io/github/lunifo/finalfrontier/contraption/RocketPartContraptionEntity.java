@@ -1,6 +1,8 @@
 package io.github.lunifo.finalfrontier.contraption;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.StructureTransform;
@@ -19,6 +21,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -32,6 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -39,9 +44,12 @@ import java.util.Set;
 
 public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	private static final EntityDataAccessor<Float> THROTTLE = SynchedEntityData.defineId(RocketPartContraptionEntity.class, EntityDataSerializers.FLOAT);
+	private static final EntityDataAccessor<Vector3f> ORIENTATION = SynchedEntityData.defineId(RocketPartContraptionEntity.class, EntityDataSerializers.VECTOR3);
 
 	public Orientation orientation = new Orientation();
 	private Orientation prevOrientation = new Orientation();
+
+	private final Orientation rotationSpeed = new Orientation();
 
 	private int despawnTicks;
 	private boolean isDetached;
@@ -63,6 +71,17 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	protected void defineSynchedData() {
 		super.defineSynchedData();
 		this.entityData.define(THROTTLE, 0.0F);
+		this.entityData.define(ORIENTATION, new Vector3f());
+	}
+
+	@Override
+	public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> entityDataAccessor) {
+		super.onSyncedDataUpdated(entityDataAccessor);
+
+		if (entityDataAccessor == ORIENTATION && level().isClientSide) {
+			prevOrientation = orientation;
+			orientation = getSyncedOrientation();
+		}
 	}
 
 	@Override
@@ -96,6 +115,20 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			);
 		}
 
+		if (!level().isClientSide) {
+			rotationSpeed.pitch *= 0.8F;
+			rotationSpeed.roll *= 0.8F;
+			rotationSpeed.yaw *= 0.8F;
+
+			prevOrientation = orientation.copy();
+
+			orientation.pitch += rotationSpeed.pitch;
+			orientation.roll += rotationSpeed.roll;
+			orientation.yaw += rotationSpeed.yaw;
+
+			setSyncedOrientation(orientation);
+		}
+
 		applyForces();
 		Vec3 velocity = getDeltaMovement().multiply(0.05, 0.05, 0.05);
 		move(velocity.x, velocity.y, velocity.z);
@@ -104,6 +137,7 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 		if (collisionPos != null) {
 			setContraptionMotion(Vec3.ZERO);
 			setPos(collisionPos.getCenter().add(0, 0.5, 0));
+			setOrientation(new Orientation());
 		}
 
 		if (getY() > PlayerUtil.SPACE_TRANSITION_END) {
@@ -139,19 +173,17 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 				discard();
 			}
 		}
-
-		if (getVehicle() == null) {
-			prevOrientation = orientation.copy();
-			// Change orientation here
-		}
 	}
 
 	private void applyForces() {
 		float throttle = getThrottle();
 		Vec3 engineAcceleration = new Vec3(0, 0.7, 0).multiply(throttle, throttle, throttle);
+		engineAcceleration = applyRotation(engineAcceleration, 0);
+
 		Vec3 gravityAcceleration = new Vec3(0, (-9.81) / 20, 0);
-		Vec3 acceleration = engineAcceleration.add(gravityAcceleration);
-		Vec3 newVelocity = getDeltaMovement().add(acceleration);
+
+		Vec3 totalAcceleration = engineAcceleration.add(gravityAcceleration);
+		Vec3 newVelocity = getDeltaMovement().add(totalAcceleration);
 		setContraptionMotion(newVelocity);
 	}
 
@@ -328,6 +360,17 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 			setThrottle(0);
 		}
 
+		if (getVehicle() == null) {
+			if (heldControls.contains(0))
+				rotationSpeed.pitch += 1;
+			if (heldControls.contains(1))
+				rotationSpeed.pitch -= 1;
+			if (heldControls.contains(2))
+				rotationSpeed.roll -= 1;
+			if (heldControls.contains(3))
+				rotationSpeed.roll += 1;
+		}
+
 		return true;
 	}
 
@@ -335,18 +378,54 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	protected void readAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.readAdditional(compound, spawnPacket);
 		entityData.set(THROTTLE, compound.getFloat("Throttle"));
+
+		DataResult<Orientation> result = Orientation.CODEC.parse(NbtOps.INSTANCE, compound.get("Orientation"));
+		result.resultOrPartial(FinalFrontier.LOGGER::error).ifPresent(this::setOrientation);
 	}
 
 	@Override
 	protected void writeAdditional(CompoundTag compound, boolean spawnPacket) {
 		super.writeAdditional(compound, spawnPacket);
 		compound.putFloat("InFlight", getThrottle());
+
+		DataResult<Tag> result = Orientation.CODEC.encodeStart(NbtOps.INSTANCE, getSyncedOrientation());
+		result.resultOrPartial(FinalFrontier.LOGGER::error).ifPresent(tag -> compound.put("Orientation", tag));
+	}
+
+	public Orientation getSyncedOrientation() {
+		Vector3f orientationVec = entityData.get(ORIENTATION);
+		return Orientation.fromVec(new Vec3(orientationVec));
+	}
+
+	public void setSyncedOrientation(Orientation orientation) {
+		Vector3f orientationVec = orientation.asVec().toVector3f();
+		entityData.set(ORIENTATION, orientationVec);
+	}
+
+	public void setOrientation(Orientation orientation) {
+		setSyncedOrientation(orientation);
+		this.prevOrientation = this.orientation.copy();
+		this.orientation = orientation;
 	}
 
 	public static class Orientation {
+		public static final Codec<Orientation> CODEC = Vec3.CODEC.xmap(Orientation::fromVec, Orientation::asVec);
+
 		public float pitch;
 		public float roll;
 		public float yaw;
+
+		public static Orientation fromVec(Vec3 vec) {
+			Orientation orientation = new Orientation();
+			orientation.pitch = (float) vec.x;
+			orientation.roll = (float) vec.y;
+			orientation.yaw = (float) vec.z;
+			return orientation;
+		}
+
+		public Vec3 asVec() {
+			return new Vec3(pitch, roll, yaw);
+		}
 
 		public ContraptionRotationState toRotationState() {
 			ContraptionRotationState rotationState = new ContraptionRotationState();
