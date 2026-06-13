@@ -75,18 +75,13 @@ public class RocketPartContraptionEntity extends AbstractContraptionEntity {
 	}
 
 	@Override
-	public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> entityDataAccessor) {
-		super.onSyncedDataUpdated(entityDataAccessor);
+	public void tick() {
+		super.tick();
 
-		if (entityDataAccessor == ORIENTATION && level().isClientSide) {
+		if (level().isClientSide) {
 			prevOrientation = orientation;
 			orientation = getSyncedOrientation();
 		}
-	}
-
-	@Override
-	public void tick() {
-		super.tick();
 
 		if (level().dimension() == FinalFrontierDimensions.DEEP_SPACE && !level().isClientSide) {
 			if (currentCelestialBody == null) {
