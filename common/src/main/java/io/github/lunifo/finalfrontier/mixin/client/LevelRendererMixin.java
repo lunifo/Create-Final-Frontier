@@ -1,0 +1,94 @@
+package io.github.lunifo.finalfrontier.mixin.client;
+
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
+import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
+import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(LevelRenderer.class)
+public class LevelRendererMixin {
+	@Shadow
+	private @Nullable ClientLevel level;
+	@Shadow
+	private @Nullable VertexBuffer starBuffer;
+
+	@WrapMethod(method = "renderClouds")
+	private void noCloudsWithoutAtmosphere(PoseStack poseStack, Matrix4f matrix4f, float f, double d, double e, double g, Operation<Void> original) {
+		if (level != null) {
+			if (level.dimension() == FinalFrontierDimensions.DEEP_SPACE) {
+				return;
+			}
+
+			CelestialBody celestialBody = CelestialBody.DIMENSION_LOOKUP.get(level.dimension());
+			if (celestialBody != null) {
+				if (!celestialBody.hasAtmosphere()) {
+					return;
+				}
+			}
+		}
+
+		original.call(poseStack, matrix4f, f, d, e, g);
+	}
+
+	@Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V", ordinal = 0), cancellable = true)
+	private void dontRenderMoonAndSun(PoseStack poseStack, Matrix4f matrix4f, float f, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci, @Local(name = "bufferBuilder") BufferBuilder bufferBuilder) {
+		poseStack.popPose();
+
+		// Cloned from renderSky with null checks
+		ShaderInstance shader = GameRenderer.getPositionShader();
+		if (level != null && starBuffer != null && shader != null) {
+			float b = level.getStarBrightness(f);
+			if (b > 0.0F) {
+				RenderSystem.setShaderColor(b, b, b, b);
+				FogRenderer.setupNoFog();
+				starBuffer.bind();
+				starBuffer.drawWithShader(poseStack.last().pose(), matrix4f, shader);
+				VertexBuffer.unbind();
+				runnable.run();
+			}
+		}
+
+		// Custom drawing stuff here
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.XP.rotationDegrees(45));
+		RenderSystem.disableBlend();
+		Matrix4f matrix = poseStack.last().pose();
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		RenderSystem.setShaderTexture(0, new ResourceLocation("minecraft", "textures/block/pearlescent_froglight_top.png"));
+
+		float size = 120;
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilder.vertex(matrix, -size, 100, -size).uv(0, 0).endVertex();
+		bufferBuilder.vertex(matrix, size, 100, -size).uv(1, 0).endVertex();
+		bufferBuilder.vertex(matrix, size, 100, size).uv(1, 1).endVertex();
+		bufferBuilder.vertex(matrix, -size, 100, size).uv(0, 1).endVertex();
+		BufferUploader.drawWithShader(bufferBuilder.end());
+		poseStack.popPose();
+
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.depthMask(true);
+		RenderSystem.enableBlend();
+
+		ci.cancel();
+	}
+}
+
+

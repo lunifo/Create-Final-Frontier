@@ -6,7 +6,8 @@
   "client": [
     "client.ClientLevelMixin",
     "client.DimensionSpecialEffectsMixin",
-    "client.FogRendererMixin"
+    "client.FogRendererMixin",
+    "client.LevelRendererMixin"
   ],
   "mixins": [
     "ControlsInteractionBehaviourMixin",
