@@ -5,8 +5,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Axis;
 import io.github.lunifo.finalfrontier.celestial_body.CelestialBody;
+import io.github.lunifo.finalfrontier.client.render.CelestialBodyRenderer;
 import io.github.lunifo.finalfrontier.worldgen.dimension.FinalFrontierDimensions;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -66,26 +65,10 @@ public class LevelRendererMixin {
 			}
 		}
 
-		// Custom drawing stuff here
-		poseStack.pushPose();
-		poseStack.mulPose(Axis.XP.rotationDegrees(45));
-		RenderSystem.disableBlend();
-		Matrix4f matrix = poseStack.last().pose();
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.setShaderTexture(0, new ResourceLocation("minecraft", "textures/block/pearlescent_froglight_top.png"));
-
-		float size = 120;
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		bufferBuilder.vertex(matrix, -size, 100, -size).uv(0, 0).endVertex();
-		bufferBuilder.vertex(matrix, size, 100, -size).uv(1, 0).endVertex();
-		bufferBuilder.vertex(matrix, size, 100, size).uv(1, 1).endVertex();
-		bufferBuilder.vertex(matrix, -size, 100, size).uv(0, 1).endVertex();
-		BufferUploader.drawWithShader(bufferBuilder.end());
-		poseStack.popPose();
+		CelestialBodyRenderer.renderCelestialBodies(poseStack, bufferBuilder);
 
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.depthMask(true);
-		RenderSystem.enableBlend();
 
 		ci.cancel();
 	}
