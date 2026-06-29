@@ -48,7 +48,7 @@ public class LevelRendererMixin {
 	}
 
 	@Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V", ordinal = 0), cancellable = true)
-	private void dontRenderMoonAndSun(PoseStack poseStack, Matrix4f matrix4f, float f, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci, @Local(name = "bufferBuilder") BufferBuilder bufferBuilder) {
+	private void dontRenderMoonAndSun(PoseStack poseStack, Matrix4f matrix4f, float f, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci, @SuppressWarnings("LocalMayUseName") @Local BufferBuilder bufferBuilder) {
 		poseStack.popPose();
 
 		// Cloned from renderSky with null checks
